@@ -1,0 +1,1 @@
+<li><a href="{dashboard_url}/{url}.html">{label}</a></li>
