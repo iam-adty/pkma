@@ -4,8 +4,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config = [
 	'non-secure' => [
 		'blog' => [
-			'name' => 'Adty Blog Wes Ewes Ewes Bablas Angine',
-			'description' => 'Just another blog source code'
+			'name' => 'PKMA',
+			'description' => 'PKMA'
 		]
 	],
 	'secure' => [

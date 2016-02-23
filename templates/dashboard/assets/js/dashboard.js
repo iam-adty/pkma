@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	$('#page-item-container .page-item').each(function(index, el) {
+	$('#panel-item-container .panel-item').each(function(index, el) {
 		if ($(el).position().left > 0) {
 			$(el).css('float', 'right');
 		}
@@ -12,11 +12,19 @@ $(document).ready(function() {
 	$('.autogrow-textarea').autoGrow();
 });
 
-$('.page-item, .category-item').mouseover(function(){
+$(window).resize(function(){
+	$('#panel-item-container .panel-item').each(function(index, el) {
+		if ($(el).position().left > 0) {
+			$(el).css('float', 'right');
+		}
+	});
+});
+
+$('.panel-item').mouseover(function(){
 	$(this).find('.panel-body-action').removeClass('hidden');
 });
 
-$('.page-item, .category-item').mouseout(function(){
+$('.panel-item').mouseout(function(){
 	$(this).find('.panel-body-action').addClass('hidden');
 });
 

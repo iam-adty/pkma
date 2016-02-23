@@ -73,11 +73,15 @@ class Model_post extends MY_Model
 		$this->db->select('GROUP_CONCAT(DISTINCT level.name) AS level');
 		$this->db->select('GROUP_CONCAT(DISTINCT access_user_table.name) AS access_user');
 		$this->db->select('GROUP_CONCAT(DISTINCT access_level_table.name) AS access_level');
+		$this->db->select('GROUP_CONCAT(DISTINCT category.name) AS post_category');
+		$this->db->select('GROUP_CONCAT(DISTINCT category.id) AS post_category_id');
 	}
 
 	private function _join()
 	{
 		$this->db->join('log', "log.table_id = post.id AND log.table_name = 'post' AND log.type = 'create'");
+		$this->db->join('post_category', 'post_category.post_id = post.id');
+		$this->db->join('category', 'category.id = post_category.category_id');
 
 		$user_post_level_join = ' AND user_post_level.user_id = ' . $this->db->escape('0');
 		$user_post_access_join = ' AND user_post_access.user_id = ' . $this->db->escape('0');

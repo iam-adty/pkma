@@ -184,7 +184,7 @@ class Template
 				$return = $library_data['data'];
 				break;
 
-			case 'single-array':
+			case 'single-array-to-parse':
 				$return = $this->parse($template, array_merge($this->_data, $library_data['data']), TRUE);
 				break;
 		}

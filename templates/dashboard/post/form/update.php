@@ -4,12 +4,23 @@
 		<input type="hidden" name="id" value="{id}">
 		<input type="hidden" name="{blog_csrf_name}" value="{blog_csrf_hash}">
 		<div class="col-lg-4 col-xs-12 col-sm-12 col-md-4 pull-right">
-			{message}
+			{form_message}
 			<h4>Update Page</h4>
 		    <div class="form-group">
 				<label for="title">Title</label>
 				{title_message}
 				<textarea name="title" id="title" class="form-control autogrow-textarea">{title}</textarea>
+			</div>
+			<div class="form-group">
+				<label for="category">Category</label>
+				{category_message}
+				<select name="category" class="form-control">
+					{template_post/form/option-category|(
+						"library" : [
+							"post", "category"
+						]
+					)}
+				</select>
 			</div>
 		    <div class="form-group">
 				<label for="status">Status</label>

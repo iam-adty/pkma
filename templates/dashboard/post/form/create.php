@@ -3,14 +3,25 @@
 		<input type="hidden" name="action" value="create">
 		<input type="hidden" name="{blog_csrf_name}" value="{blog_csrf_hash}">
 		<div class="col-lg-4 col-xs-12 col-sm-12 col-md-4 pull-right">
-		    {message}
-		    <h4>Create New Post</h4>
-		    <div class="form-group">
+			{form_message}
+			<h4>Create New Post</h4>
+			<div class="form-group">
 				<label for="title">Title</label>
 				{title_message}
 				<textarea name="title" id="title" class="form-control autogrow-textarea">{title}</textarea>
 			</div>
-		    <div class="form-group">
+			<div class="form-group">
+				<label for="category">Category</label>
+				{category_message}
+				<select name="category" class="form-control">
+					{template_post/form/option-category|(
+						"library" : [
+							"post", "category"
+						]
+					)}
+				</select>
+			</div>
+			<div class="form-group">
 				<label for="status">Status</label>
 				{status_message}
 				<select name="status" id="status" class="form-control">
@@ -19,10 +30,10 @@
 					<option value="published" {status_published}>Published</option>
 				</select>
 			</div>
-		    <div class="form-group hidden-xs hidden-sm">
-		    	<button type="submit" class="btn btn-primary">Save</button>
-		    	<button type="reset" class="btn btn-default">Cancel</button>
-		    </div>
+			<div class="form-group hidden-xs hidden-sm">
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button type="reset" class="btn btn-default">Cancel</button>
+			</div>
 		</div>
 		<div class="col-lg-8 col-xs-12 col-sm-12 col-md-8 pull-right">
 			<div class="form-group">
@@ -31,9 +42,9 @@
 				<textarea name="content" id="content" class="form-control summernote-container">{content}</textarea>
 			</div>
 			<div class="form-group hidden-lg hidden-md">
-		    	<button type="submit" class="btn btn-primary">Save</button>
-		    	<button type="reset" class="btn btn-default">Cancel</button>
-		    </div>
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button type="reset" class="btn btn-default">Cancel</button>
+			</div>
 		</div>
 	</form>
 </div>

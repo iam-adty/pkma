@@ -9,11 +9,12 @@ class Post
 		'draft', 'pending', 'published'
 	);
 	private $_limit = 10;
+	private $_temporary = array();
 
 	public function __construct($init = array())
 	{
 		$this->CI =& get_instance();
-		$this->CI->load->model(array('model_post', 'model_log', 'model_user_post_level'));
+		$this->CI->load->model(array('model_post', 'model_log', 'model_user_post_level', 'model_category', 'model_post_category'));
 
 		if(array_key_exists('data', $init))
 			$this->_data = $init['data'];
@@ -70,11 +71,13 @@ class Post
 		$data = array(
 			'content' => set_value('content'),
 			'title' => set_value('title'),
+			'category' => set_value('category'),
 			'status' => set_value('status','draft'),
 			'content_message' => text_danger(form_error('content')),
 			'title_message' => text_danger(form_error('title')),
+			'category_message' => text_danger(form_error('category')),
 			'status_message' => text_danger(form_error('status')),
-			'message' => $this->_message
+			'form_message' => $this->_message
 		);
 
 		foreach ($this->_page_status_option as $key => $value)
@@ -85,14 +88,14 @@ class Post
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _create_action()
 	{
 		if(input_post('action') == 'create')
 		{			
-			if($this->CI->form_validation->run('dashboard/page/create'))
+			if($this->CI->form_validation->run('dashboard/post/create'))
 			{
 				$this->CI->db->trans_start();
 
@@ -121,7 +124,30 @@ class Post
 				$post_log_id = $insert_post_log['status'] ? $insert_post_log['id'] : 0;
 				//
 
-				//insert data to table user_post_level
+				//post category
+				$data_post_category = array(
+					'post_id' => $post_id,
+					'category_id' => input_post('category')
+				);
+				$insert_post_category = $this->CI->model_post_category->create($data_post_category, TRUE);
+				$post_category_id = $insert_post_category['status'] ? $insert_post_category['id'] : 0;
+				//
+
+				//post category log
+				$data_log = array(
+					'parent' => $post_log_id,
+					'table_name' => 'post_category',
+					'table_id' => $post_category_id,
+					'type' => 'create',
+					'description' => '',
+					'date' => date('Y-m-d H:i:s'),
+					'user_id' => $this->CI->session->userdata('blog_user')['id']
+				);
+				$insert_post_category_log = $this->CI->model_log->create($data_log, TRUE);
+				$post_category_log_id = $insert_post_category_log['status'] ? $insert_post_category_log['id'] : 0;
+				//
+
+				//user_post_level
 				$data_user_post_level_create = array(
 					'user_id' => $this->CI->session->userdata('blog_user')['id'],
 					'level_id' => '200',
@@ -209,10 +235,12 @@ class Post
 			'content' => set_value('content', $page['post_content']),
 			'title' => set_value('title', $page['post_title']),
 			'status' => set_value('status', $page['post_status']),
+			'category' => set_value('category', $page['post_category']),
 			'content_message' => text_danger(form_error('content')),
 			'title_message' => text_danger(form_error('title')),
 			'status_message' => text_danger(form_error('status')),
-			'message' => $this->_message
+			'category_message' => text_danger(form_error('category')),
+			'form_message' => $this->_message
 		);
 
 		foreach ($this->_page_status_option as $key => $value)
@@ -223,7 +251,7 @@ class Post
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _update_action()
@@ -255,6 +283,34 @@ class Post
 				);
 				$create_post_log = $this->CI->model_log->create($data_log, TRUE);
 				$post_log_id = $create_post_log['status'] ? $create_post_log['id'] : 0;
+				//
+
+				//update category log
+				$post_category_id = $this->CI->model_post_category->read(array(
+					'AND' => array(
+						'post_id' => input_post('id')
+					)
+				), TRUE, 1, 1)->row_array()['id'];
+
+				$data_post_category = array(
+					'category_id' => input_post('category')
+				);
+
+				$update_post_category = $this->CI->model_post_category->update($data_post_category, $post_category_id, FALSE, TRUE);
+				//
+				
+				//log post_category
+				$data_log = array(
+					'parent' => $post_log_id,
+					'table_name' => 'post_category',
+					'table_id' => $post_category_id,
+					'type' => 'update',
+					'description' => '',
+					'date' => date('Y-m-d H:i:s'),
+					'user_id' => $this->CI->session->userdata('blog_user')['id']
+				);
+				$create_post_category_log = $this->CI->model_log->create($data_log, TRUE);
+				$post_category_log_id = $create_post_category_log['status'] ? $create_post_category_log['id'] : 0;
 				//
 
 				//update user_post_level if any
@@ -338,6 +394,27 @@ class Post
 		), TRUE, TRUE);
 		//
 
+		//delete post category
+		$post_category = $this->CI->model_post_category->read(array(
+			'AND' => ['post_id' => $id]
+		), TRUE, 0, 0);
+		$post_cateogry_id = array();
+		foreach ($post_category->result_array() as $key => $value)
+		{
+			$post_category_id[] = $value['id'];
+		}
+		$delete_post_category = $this->CI->model_post_category->delete(array(
+			'column' => 'post_id', 'value' => $id
+		), FALSE, TRUE);
+		//
+
+		//delete post category log
+		$delete_post_category_log = $this->CI->model_log->delete(array(
+			'AND' => array('table_name' => 'post_category'),
+			'IN' => array('table_id' => $post_category_id)
+		), TRUE, TRUE);
+		//
+
 		//delete user_post_level
 		$user_post_level = $this->CI->model_user_post_level->read(array(
 			'AND' => array('post_id' => $id)
@@ -413,6 +490,80 @@ class Post
 	public function count()
 	{
 		return ['type' => 'number', 'data' => $this->_count()];
+	}
+
+	public function category()
+	{
+		$item = array();
+		$category = $this->CI->model_category->read(array(
+			'AND_GROUP' => array(
+				'IN' => array(
+					'access_user_table.name' => array(
+						'dashboard_category_list', 'dashboard_category_list_own', 'dashboard_category_list_other'
+					)
+				),
+				'OR_IN' => array(
+					'access_level_table.name' => array(
+						'dashboard_category_list', 'dashboard_category_list_own', 'dashboard_category_list_other'
+					)
+				)
+			),
+			'NOT_GROUP' => array(
+				'IN' => array(
+					'access_user_table.name' => array(
+						'revoke_dashboard_category_list', 'revoke_dashboard_category_list_own', 'revoke_dashboard_category_list_other'
+					),
+					'access_level_table.name' => array(
+						'revoke_dashboard_category_list', 'revoke_dashboard_category_list_own', 'revoke_dashboard_category_list_other'
+					)
+				)
+			)
+		), TRUE, 0, 0);
+
+		$post = array();
+		if($this->CI->uri->segment('3') == 'update')
+		{
+			$post = $this->CI->model_post->read(array(
+				'AND' => array(
+					'post.id' => $this->CI->uri->segment(4),
+					'post.type' => 'post'
+				),
+				'AND_GROUP' => array(
+					'IN' => array(
+						'access_user_table.name' => array(
+							'dashboard_post_update', 'dashboard_post_update_own', 'dashboard_post_update_other'
+						)
+					),
+					'OR_IN' => array(
+						'access_level_table.name' => array(
+							'dashboard_post_update', 'dashboard_post_update_own', 'dashboard_post_update_other'
+						)
+					)
+				),
+				'NOT_GROUP' => array(
+					'IN' => array(
+						'access_level_table.name' => array(
+							'revoke_dashboard_post_update', 'revoke_dashboard_post_update_own', 'revoke_dashboard_post_update_other'
+						),
+						'access_user_table.name' => array(
+							'revoke_dashboard_post_update', 'revoke_dashboard_post_update_own', 'revoke_dashboard_post_update_other'
+						)
+					)
+				)
+			), TRUE, 1, 1)->row_array();
+		}
+
+		foreach ($category->result_array() as $key => $value)
+		{
+			$value['category_selected'] = '';
+			if(($this->CI->uri->segment(3) == 'update' && set_value('category', '') == '' && $value['category_id'] == $post['post_category_id']) || (set_value('category') != '' && $value['category_id'] == set_value('category')))
+			{
+				$value['category_selected'] = 'selected="selected"';
+			}
+			$item[] = $value;
+		}
+
+		return ['type' => 'array-list-to-parse', 'data' => $item];
 	}
 
 	public function pagination($data = array())

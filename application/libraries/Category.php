@@ -51,30 +51,12 @@ class Category
 
 		$category = $this->CI->model_category->read($identifier, TRUE, input_get('page', 1), $this->_limit, input_get('search'));
 
-		$update_id = $this->CI->uri->segment(3) == 'update' ? $this->CI->uri->segment(4) : 0;
-		$selected_parent = '';
-
 		$item_id = array();
 		foreach ($category->result_array() as $key => $value)
 		{
 			$value['category_description'] = rich_text_limiter($value['category_description'], 50);
 			$value['log_date'] = date_format(date_create($value['log_date']), 'l. F d, Y \a\t H:i:s');
-
-			if($value['category_id'] == $update_id)
-				$selected_parent = $value['category_parent'];
-
-			if($value['category_id'] == set_value('parent', ''))
-				$value['category_selected'] = 'selected="selected"';
-			else
-				$value['category_selected'] = '';
-
-			$item_id[] = $value['category_id'];
 			$item[] = $value;
-		}
-
-		if($selected_parent != '' && set_value('parent', '') == '')
-		{
-			$item[array_search($selected_parent, $item_id)]['category_selected'] = 'selected="selected"';
 		}
 
 		return ['type' => 'array-list-to-parse', 'data' => $item];
@@ -104,7 +86,7 @@ class Category
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _create_action()
@@ -239,7 +221,7 @@ class Category
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _update_action()
@@ -422,6 +404,65 @@ class Category
 	public function count()
 	{
 		return ['type' => 'number', 'data' => $this->_count()];
+	}
+
+	public function read_parent()
+	{
+		$item = array();
+		$identifier = array(
+			'AND_GROUP' => array(
+				'IN' => array(
+					'access_user_table.name' => array(
+						'dashboard_category_list', 'dashboard_category_list_own', 'dashboard_category_list_other'
+					)
+				),
+				'OR_IN' => array(
+					'access_level_table.name' => array(
+						'dashboard_category_list', 'dashboard_category_list_own', 'dashboard_category_list_other'
+					)
+				)
+			),
+			'NOT_GROUP' => array(
+				'IN' => array(
+					'access_user_table.name' => array(
+						'revoke_dashboard_category_list', 'revoke_dashboard_category_list_own', 'revoke_dashboard_category_list_other'
+					),
+					'access_level_table.name' => array(
+						'revoke_dashboard_category_list', 'revoke_dashboard_category_list_own', 'revoke_dashboard_category_list_other'
+					)
+				)
+			)
+		);
+
+		$category = $this->CI->model_category->read($identifier, TRUE, 0, 0);
+
+		$update_id = $this->CI->uri->segment(3) == 'update' ? $this->CI->uri->segment(4) : 0;
+		$selected_parent = '';
+
+		$item_id = array();
+		foreach ($category->result_array() as $key => $value)
+		{
+			$value['category_description'] = rich_text_limiter($value['category_description'], 50);
+			$value['log_date'] = date_format(date_create($value['log_date']), 'l. F d, Y \a\t H:i:s');
+
+			if($value['category_id'] == $update_id)
+				$selected_parent = $value['category_parent'];
+
+			if($value['category_id'] == set_value('parent', ''))
+				$value['category_selected'] = 'selected="selected"';
+			else
+				$value['category_selected'] = '';
+
+			$item_id[] = $value['category_id'];
+			$item[] = $value;
+		}
+
+		if($selected_parent != '' && set_value('parent', '') == '')
+		{
+			$item[array_search($selected_parent, $item_id)]['category_selected'] = 'selected="selected"';
+		}
+
+		return ['type' => 'array-list-to-parse', 'data' => $item];
 	}
 
 	public function pagination($data = array())

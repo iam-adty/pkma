@@ -9,15 +9,8 @@ class Blog extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->config->load('adtyblog', TRUE);
-		$this->_config = $this->config->item('adtyblog');
-		$this->_template = $this->_config['template']['default']['blog'];
-		$this->load->library('blog_template', array(
-			'config' => array(
-				'general' => $this->_config['general'],
-				'template' => $this->_config['template']
-			)
-		));
+		$this->config->load('blog', TRUE);
+		$this->_config = $this->config->item('blog');
 	}
 
 	public function _remap()
@@ -32,8 +25,6 @@ class Blog extends CI_Controller {
 
 	private function _index()
 	{
-		$data = array();
-		$index_view = $this->parser->parse($this->_template . '/index', $data, TRUE);
-		$this->blog_template->parse($index_view, $data);
+		exit('<h1>PKMA</h1>');
 	}
 }

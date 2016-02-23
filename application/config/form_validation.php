@@ -100,5 +100,54 @@ $config = array(
 				'trim', 'required'
 			)
 		)
-	)
+	),
+	'dashboard/post/create' => array(
+		array(
+			'field' => 'title', 'label' => 'Title', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'content', 'label' => 'Content', 'rules' => array(
+				'trim'
+			)
+		),
+		array(
+			'field' => 'status', 'label' => 'Status', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'category', 'label' => 'Category', 'rules' => array(
+				'trim', 'required'
+			)
+		)
+	),
+	'dashboard/post/update' => array(
+		array(
+			'field' => 'id', 'label' => 'ID', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'title', 'label' => 'Title', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'content', 'label' => 'Content', 'rules' => array(
+				'trim'
+			)
+		),
+		array(
+			'field' => 'status', 'label' => 'Status', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'category', 'label' => 'Category', 'rules' => array(
+				'trim', 'required'
+			)
+		)
+	),
 );

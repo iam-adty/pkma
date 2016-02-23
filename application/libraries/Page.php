@@ -85,7 +85,7 @@ class Page
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _create_action()
@@ -223,7 +223,7 @@ class Page
 				$data['status_' . $value] = '';
 		}
 
-		return ['type' => 'single-array', 'data' => $data];
+		return ['type' => 'single-array-to-parse', 'data' => $data];
 	}
 
 	private function _update_action()

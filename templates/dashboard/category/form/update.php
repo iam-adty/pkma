@@ -13,7 +13,7 @@
 					<option value="0">-No Parent-</option>
 					{template_category/form/option-parent|(
 						"library" : [
-							"category", "read"
+							"category", "read_parent"
 						]
 					)}
 				</select>

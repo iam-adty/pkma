@@ -1,4 +1,4 @@
-<div class="col-lg-6 page-item">
+<div class="col-lg-6 panel-item">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">{post_title}</h3>
@@ -6,13 +6,16 @@
 		<div class="panel-body">
 			<div class="post-info">
 				<span class="created-by">
-					created by <a href="{dashboard_url}/user/{post_author_id}">{post_author_name}</a>
+					created by <b><u>{post_author_name}</u></b>
 				</span>
 				<span class="created-on">
-					on {log_date}
+					on <i>{log_date}</i>
+				</span>
+				<span class="category">
+					in category <u>{post_category}</u>
 				</span>
 				<span class="status">
-					(status : {post_status})
+					and is <b><i>{post_status}</i></b>
 				</span>
 			</div>
 			<div class="post-content">

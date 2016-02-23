@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/adtyblog/';
+$config['base_url'] = 'http://localhost/pkma/';
 
 /*
 |--------------------------------------------------------------------------
@@ -314,7 +314,7 @@ $config['cache_query_string'] = array('redirect', 'search');
 | http://codeigniter.com/user_guide/libraries/encryption.html
 |
 */
-$config['encryption_key'] = 'ADTYblog321';
+$config['encryption_key'] = 'N0vD94Q1z796I4Tba55Pg001074h130c';
 
 /*
 |--------------------------------------------------------------------------
@@ -368,7 +368,7 @@ $config['encryption_key'] = 'ADTYblog321';
 |
 */
 $config['sess_driver'] = 'files';
-$config['sess_cookie_name'] = 'adtyblog_session';
+$config['sess_cookie_name'] = 'pkma_session';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = FCPATH . 'session';
 $config['sess_match_ip'] = TRUE;
@@ -390,9 +390,9 @@ $config['sess_regenerate_destroy'] = TRUE;
 |       'cookie_httponly') will also affect sessions.
 |
 */
-$config['cookie_prefix']	= 'adtyblog_cookie_';
-$config['cookie_domain']	= 'localhost';
-$config['cookie_path']		= '/adtyblog/';
+$config['cookie_prefix']	= 'pkma_cookie_';
+$config['cookie_domain']	= '';
+$config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
 $config['cookie_httponly'] 	= FALSE;
 
@@ -439,8 +439,8 @@ $config['global_xss_filtering'] = TRUE;
 | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
 $config['csrf_protection'] = TRUE;
-$config['csrf_token_name'] = 'adtyblog_csrf_token';
-$config['csrf_cookie_name'] = 'adtyblog_csrf_cookie';
+$config['csrf_token_name'] = 'blog_csrf_token';
+$config['csrf_cookie_name'] = 'blog_csrf_cookie';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();
