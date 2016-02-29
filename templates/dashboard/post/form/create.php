@@ -41,6 +41,10 @@
 				{content_message}
 				<textarea name="content" id="content" class="form-control summernote-container">{content}</textarea>
 			</div>
+			<div class="form-group">
+				<label for="image">Image</label>
+				<input type="file" name="image" id="image" class="form-control">
+			</div>
 			<div class="form-group hidden-lg hidden-md">
 				<button type="submit" class="btn btn-primary">Save</button>
 				<button type="reset" class="btn btn-default">Cancel</button>

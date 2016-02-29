@@ -16,11 +16,11 @@ class Model_post extends MY_Model
 		return parent::create($data, $global_transaction);
 	}
 
-	public function read($identifier = array(), $grouped_identifier = FALSE, $page = 1, $limit = 10, $search = '')
+	public function read($identifier = array(), $grouped_identifier = FALSE, $page = 1, $limit = 10, $search = '', $is_public = FALSE)
 	{
 		$this->_select();
 
-		$this->_join();
+		$this->_join($is_public);
 
 		$this->_search($search);
 
@@ -30,18 +30,18 @@ class Model_post extends MY_Model
 		return parent::read($identifier, $grouped_identifier, $page, $limit);
 	}
 
-	public function count($identifier = array(), $grouped_identifier = FALSE, $search = '')
+	public function count($identifier = array(), $grouped_identifier = FALSE, $search = '', $is_public = FALSE)
 	{
 		//count 1
 		$this->_select();
-		$this->_join();
+		$this->_join($is_public);
 		$this->_search($search);
 		$this->db->group_by('post.id');
 		$count1 = parent::count($identifier, $grouped_identifier);
 
 		//count 2
 		$this->_select();
-		$this->_join();
+		$this->_join($is_public);
 		$this->_search($search);
 		$count2 = parent::count($identifier, $grouped_identifier);
 
@@ -67,8 +67,8 @@ class Model_post extends MY_Model
 
 	private function _select()
 	{		
-		$this->db->select('post.id AS post_id, post.title AS post_title, post.url AS post_url, post.content AS post_content, post.type AS post_type, post.status AS post_status');
-		$this->db->select('user.id AS post_author_id, IF(user.id = ' . $this->db->escape($this->session->userdata('blog_user')['id']) . ', \'you\', user.name) AS post_author_name');
+		$this->db->select('post.id AS post_id, post.title AS post_title, post.url AS post_url, post.content AS post_content, post.type AS post_type, post.status AS post_status, post.image AS post_image');
+		$this->db->select('user.id AS post_author_id, IF(user.id = ' . $this->db->escape($this->session->userdata('blog_user')['id']) . ', \'you\', user.name) AS post_author_name, user.image AS post_author_image, user.username AS post_author_username');
 		$this->db->select('log.type AS log_type, log.description AS log_description, log.date AS log_date');
 		$this->db->select('GROUP_CONCAT(DISTINCT level.name) AS level');
 		$this->db->select('GROUP_CONCAT(DISTINCT access_user_table.name) AS access_user');
@@ -77,7 +77,7 @@ class Model_post extends MY_Model
 		$this->db->select('GROUP_CONCAT(DISTINCT category.id) AS post_category_id');
 	}
 
-	private function _join()
+	private function _join($is_public = FALSE)
 	{
 		$this->db->join('log', "log.table_id = post.id AND log.table_name = 'post' AND log.type = 'create'");
 		$this->db->join('post_category', 'post_category.post_id = post.id');
@@ -86,38 +86,47 @@ class Model_post extends MY_Model
 		$user_post_level_join = ' AND user_post_level.user_id = ' . $this->db->escape('0');
 		$user_post_access_join = ' AND user_post_access.user_id = ' . $this->db->escape('0');
 
-		if(in_array('dashboard_post_list', $this->session->userdata('blog_user')['access']))
+		if($this->session->has_userdata('blog_user'))
 		{
-			if(!in_array('revoke_dashboard_post_list', $this->session->userdata('blog_user')['access']))
+			if(in_array('dashboard_post_list', $this->session->userdata('blog_user')['access']))
 			{
-				$own = FALSE;
-				if(in_array('dashboard_post_list_own', $this->session->userdata('blog_user')['access']))
+				if(!in_array('revoke_dashboard_post_list', $this->session->userdata('blog_user')['access']))
 				{
-					if(!in_array('revoke_dashboard_post_list_own', $this->session->userdata('blog_user')['access']))
+					$own = FALSE;
+					if(in_array('dashboard_post_list_own', $this->session->userdata('blog_user')['access']))
 					{
-						$own = TRUE;
-						$user_post_level_join = ' AND user_post_level.user_id = ' . $this->db->escape($this->session->userdata('blog_user')['id']);
-						$user_post_access_join = ' AND user_post_access.user_id = ' . $this->db->escape($this->session->userdata('blog_user')['id']);
-					}
-				}
-
-				if(in_array('dashboard_post_list_other', $this->session->userdata('blog_user')['access']))
-				{
-					if(!in_array('revoke_dashboard_post_list_other', $this->session->userdata('blog_user')['access']))
-					{
-						if($own)
+						if(!in_array('revoke_dashboard_post_list_own', $this->session->userdata('blog_user')['access']))
 						{
-							$user_post_level_join = '';
-							$user_post_access_join = '';
+							$own = TRUE;
+							$user_post_level_join = ' AND user_post_level.user_id = ' . $this->db->escape($this->session->userdata('blog_user')['id']);
+							$user_post_access_join = ' AND user_post_access.user_id = ' . $this->db->escape($this->session->userdata('blog_user')['id']);
 						}
-						else
+					}
+
+					if(in_array('dashboard_post_list_other', $this->session->userdata('blog_user')['access']))
+					{
+						if(!in_array('revoke_dashboard_post_list_other', $this->session->userdata('blog_user')['access']))
 						{
-							$user_post_level_join = ' AND user_post_level.user_id != ' . $this->db->escape($this->session->userdata('blog_user')['id']);
-							$user_post_access_join = ' AND user_post_access.user_id != ' . $this->db->escape($this->session->userdata('blog_user')['id']);
+							if($own)
+							{
+								$user_post_level_join = '';
+								$user_post_access_join = '';
+							}
+							else
+							{
+								$user_post_level_join = ' AND user_post_level.user_id != ' . $this->db->escape($this->session->userdata('blog_user')['id']);
+								$user_post_access_join = ' AND user_post_access.user_id != ' . $this->db->escape($this->session->userdata('blog_user')['id']);
+							}
 						}
 					}
 				}
 			}
+		}
+
+		if($is_public)
+		{
+			$user_post_level_join = '';
+			$user_post_access_join = '';
 		}
 
 		$this->db->join('user_post_level', 'user_post_level.post_id = post.id' . $user_post_level_join);

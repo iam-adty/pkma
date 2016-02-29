@@ -150,4 +150,68 @@ $config = array(
 			)
 		)
 	),
+	'dashboard/user/create' => array(
+		array(
+			'field' => 'name', 'label' => 'Name', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'username', 'label' => 'Username', 'rules' => array(
+				'trim', 'required', 'is_unique[user.username]'
+			)
+		),
+		array(
+			'field' => 'email', 'label' => 'Email', 'rules' => array(
+				'trim', 'required', 'is_unique[user.email]', 'valid_email'
+			)
+		),
+		array(
+			'field' => 'password', 'label' => 'Password', 'rules' => array(
+				'trim', 'required', 'sha1'
+			)
+		),
+		array(
+			'field' => 'status', 'label' => 'Status', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'level', 'label' => 'Level', 'rules' => array(
+				'trim', 'required'
+			)
+		)
+	),
+	'dashboard/user/update' => array(
+		array(
+			'field' => 'name', 'label' => 'Name', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'username', 'label' => 'Username', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'email', 'label' => 'Email', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'password', 'label' => 'Password', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'status', 'label' => 'Status', 'rules' => array(
+				'trim', 'required'
+			)
+		),
+		array(
+			'field' => 'level', 'label' => 'Level', 'rules' => array(
+				'trim', 'required'
+			)
+		)
+	)
 );

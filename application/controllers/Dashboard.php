@@ -71,8 +71,9 @@ class Dashboard extends CI_Controller
 	private function _login_auth()
 	{
 		$this->load->model('model_user');
+		$this->load->model('model_access');
 
-		if ($this->form_validation->run() == FALSE)
+		if ($this->form_validation->run('dashboard/login') == FALSE)
 			$this->_message = alert_danger('Error occured when logging you in!', 'text-center');
 		else
 		{
@@ -85,7 +86,8 @@ class Dashboard extends CI_Controller
 			);
 
 			$field = array(
-				'user.id', 'user.username', 'user.name', 'user.email', 'user.status', 'GROUP_CONCAT(DISTINCT level.name) AS level', 'GROUP_CONCAT(DISTINCT access.name) AS access'
+				'user.id', 'user.username', 'user.name', 'user.email', 'user.status',
+				'GROUP_CONCAT(DISTINCT level.id) AS level_id', 'GROUP_CONCAT(DISTINCT access_of_level.id) AS access_id_of_level', 'GROUP_CONCAT(DISTINCT access_of_user.id) AS access_id_of_user'
 			);
 
 			$login = $this->model_user->get($where, $field);
@@ -93,7 +95,19 @@ class Dashboard extends CI_Controller
 			if ($login->num_rows() > 0)
 			{
 				$user = $login->row_array();
-				if(in_array('dashboard_login', explode(',', $user['access'])))
+				$access_id = $this->model_access->read(array(
+					'IN' => array(
+						'id' => array_merge(explode(',', $user['access_id_of_level']), explode(',', $user['access_id_of_user']))
+					)
+				), TRUE, 0, 0)->result_array();
+				
+				$access = array();
+				foreach ($access_id as $key => $value)
+				{
+					$access[] = $value['name'];
+				}
+
+				if(in_array('dashboard_login', $access))
 				{
 					switch ($user['status'])
 					{
@@ -101,7 +115,7 @@ class Dashboard extends CI_Controller
 							$user['login_time'] = date('Y-m-d H:i:s');
 							$user['login_status'] = TRUE;
 							$user['level'] = explode(',', $user['level']);
-							$user['access'] = explode(',', $user['access']);
+							$user['access'] = $access;
 							$this->session->set_userdata('blog_user', $user);
 							redirect(input_get('redirect', 'dashboard'));
 							break;
@@ -208,6 +222,59 @@ class Dashboard extends CI_Controller
 		}
 		
 		$this->template->parse('category', $data);
+	}
+
+	public function custom($custom_name = '')
+	{
+		$this->_session_check();
+
+		$data = array_merge($this->_data);
+		$sub_page = $this->uri->segment(4);
+		if($sub_page != '')
+		{
+			if(!in_array('dashboard_custom_'.$custom_name.'_' . $sub_page, $this->session->userdata('blog_user')['access']))
+				redirect('dashboard/custom/' . $custom_name);
+			
+			if(in_array('revoke_dashboard_custom_' . $custom_name . '_' . $sub_page, $this->session->userdata('blog_user')['access']))
+				redirect('dashboard/custom/' . $custom_name);
+
+			$data['template_'.$custom_name.'/index'] = '{template_'.$custom_name.'/'. $sub_page .'}';
+		}
+		else
+		{
+			if(!in_array('dashboard_custom_'.$custom_name.'_view', $this->session->userdata('blog_user')['access']))
+			{
+				$this->session->set_flashdata('message', alert_danger('You don\'t have access to access the requested page!'));
+				redirect('dashboard');
+			}
+		}
+		
+		$this->template->parse($custom_name, $data);
+	}
+
+	public function user()
+	{
+		$this->_session_check();
+
+		$data = array_merge($this->_data);
+		$sub_page = $this->uri->segment(3);
+		if($sub_page != '')
+		{
+			if(!in_array('dashboard_user_' . $sub_page, $this->session->userdata('blog_user')['access']))
+				redirect('dashboard/user');
+
+			$data['template_user/index'] = '{template_user/'. $sub_page .'}';
+		}
+		else
+		{
+			if(!in_array('dashboard_user_view', $this->session->userdata('blog_user')['access']))
+			{
+				$this->session->set_flashdata('message', alert_danger('You don\'t have access to list users'));
+				redirect('dashboard');
+			}
+		}
+		
+		$this->template->parse('user', $data);
 	}
 
 }

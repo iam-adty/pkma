@@ -3,7 +3,7 @@
 		{template_navigation/menu/item|(
 			"get" : [
 				"menu", (
-					"item-to-show" : ["index", "page", "post", "user", "setting"]
+					"item-to-show" : ["index", "page", "post", "user", "setting", "pkma-home", "pkma-about", "pkma-news", "pkma-member", "pkma-brand", "pkma-blog"]
 				)
 			]
 		)}

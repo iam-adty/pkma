@@ -67,7 +67,7 @@ class Model_page extends MY_Model
 
 	private function _select()
 	{		
-		$this->db->select('post.id AS post_id, post.title AS post_title, post.url AS post_url, post.content AS post_content, post.type AS post_type, post.status AS post_status');
+		$this->db->select('post.id AS post_id, post.title AS post_title, post.url AS post_url, post.content AS post_content, post.type AS post_type, post.status AS post_status, post.image AS post_image');
 		$this->db->select('user.id AS post_author_id, IF(user.id = ' . $this->db->escape($this->session->userdata('blog_user')['id']) . ', \'you\', user.name) AS post_author_name');
 		$this->db->select('log.type AS log_type, log.description AS log_description, log.date AS log_date');
 		$this->db->select('GROUP_CONCAT(DISTINCT level.name) AS level');

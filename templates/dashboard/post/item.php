@@ -1,4 +1,4 @@
-<div class="col-lg-6 panel-item">
+<div class="col-lg-12 panel-item">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">{post_title}</h3>
@@ -19,7 +19,14 @@
 				</span>
 			</div>
 			<div class="post-content">
-				{post_content}
+				<div class="media">
+					<div class="media-left media-top">
+						<img width="80" class="media-object" src="{base_url}upload/image/{post_image_cropped}" alt="{post_title}">
+					</div>
+					<div class="media-body">
+						{post_content}
+					</div>
+				</div>
 			</div>
 			<div class="panel-body-action hidden">
 				<div class="main-btn-group">

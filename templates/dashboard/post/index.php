@@ -1,5 +1,5 @@
 <div class="row">
-	<div id="page-item-container" class="col-lg-8">
+	<div id="panel-item-container" class="col-lg-8">
     	<div class="row">
     		{template_post/item|(
 				"library" : [

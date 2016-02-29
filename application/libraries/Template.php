@@ -90,25 +90,37 @@ class Template
 		{
 			if(in_array($key, $item_to_show))
 			{
-				$value['active'] = '';
-				if($key == $this->CI->uri->segment(2, 'index'))
-					$value['active'] = ' active';
-
-				if(!array_key_exists('style', $value))
-					$value['style'] = '';
-				else
-					$value['style'] = ' ' . $value['style'];
-
-				$this->_menu_parent_flag = '';
-				if(array_key_exists('child', $value))
+				$show_menu = FALSE;
+				foreach ($value['access'] as $key_access => $value_access)
 				{
-					$this->_menu_parent_flag = $key;
-					unset($value['child']);
-					$view .= $this->parse($template . '-has-child', array_merge($this->_data, $data, $value), TRUE);
+					if(in_array($value_access, $this->CI->session->userdata('blog_user')['access']))
+					{
+						$show_menu = $show_menu ? $show_menu : TRUE;
+					}
 				}
-				else
+
+				if($show_menu)
 				{
-					$view .= $this->parse($template, array_merge($this->_data, $data, $value), TRUE);
+					$value['active'] = '';
+					if($key == $this->CI->uri->segment(2, 'index'))
+						$value['active'] = ' active';
+
+					if(!array_key_exists('style', $value))
+						$value['style'] = '';
+					else
+						$value['style'] = ' ' . $value['style'];
+
+					$this->_menu_parent_flag = '';
+					if(array_key_exists('child', $value))
+					{
+						$this->_menu_parent_flag = $key;
+						unset($value['child']);
+						$view .= $this->parse($template . '-has-child', array_merge($this->_data, $data, $value), TRUE);
+					}
+					else
+					{
+						$view .= $this->parse($template, array_merge($this->_data, $data, $value), TRUE);
+					}
 				}
 			}
 		}
@@ -124,7 +136,21 @@ class Template
 			if(!is_array($value))
 				$view .= $this->parse($template . $value, array_merge($this->_data, $data), TRUE);
 			else
-				$view .= $this->parse($template, array_merge($this->_data, $data, $value), TRUE);
+			{
+				$show_menu = FALSE;
+				foreach ($value['access'] as $key_access => $value_access)
+				{
+					if(in_array($value_access, $this->CI->session->userdata('blog_user')['access']))
+					{
+						$show_menu = $show_menu ? $show_menu : TRUE;
+					}
+				}
+
+				if($show_menu)
+				{
+					$view .= $this->parse($template, array_merge($this->_data, $data, $value), TRUE);
+				}
+			}
 		}
 		return $view;
 	}

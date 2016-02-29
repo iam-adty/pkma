@@ -27,11 +27,6 @@
                         {password_message}
                         <input style="text-align: center;" value="{password}" type="password" id="password" class="form-control" name="password" placeholder="Password">
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="remember-me"> Remember me
-                        </label>
-                    </div>
                     <button class="btn btn-primary btn-block" type="submit">Log in</button>
                 </form>
             </div>

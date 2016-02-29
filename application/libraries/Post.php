@@ -58,6 +58,8 @@ class Post
 		{
 			$value['post_content'] = rich_text_limiter($value['post_content'], 50);
 			$value['log_date'] = date_format(date_create($value['log_date']), 'l. F d, Y \a\t H:i:s');
+			$value['post_image'] = $value['post_image'] != '' ? $value['post_image'] : 'blank.jpg';
+			$value['post_image_cropped'] = $value['post_image'] != '' ? 'cropped-' . $value['post_image'] : 'cropped-blank.jpg';
 			$item[] = $value;
 		}
 
@@ -97,6 +99,18 @@ class Post
 		{			
 			if($this->CI->form_validation->run('dashboard/post/create'))
 			{
+				$image = '';
+				if($_FILES['image']['error'] == 0)
+				{
+					$this->CI->load->library('image');
+					$upload_image = $this->CI->image->upload('image');
+					if($upload_image['status'])
+					{
+						$image = $upload_image['data']['file_name'];
+						$crop_image = $this->CI->image->crop($upload_image['data'], $image, ['create_new' => TRUE, 'width' => 200, 'height' => 200]);
+					}
+				}
+
 				$this->CI->db->trans_start();
 
 				//insert data to table post
@@ -104,7 +118,8 @@ class Post
 					'title' => input_post('title'),
 					'content' => input_post('content'),
 					'type' => 'post',
-					'status' => input_post('status')
+					'status' => input_post('status'),
+					'image' => $image
 				);
 				$insert_post = $this->CI->model_post->create($data_post, TRUE);
 				$post_id = $insert_post['status'] ? $insert_post['id'] : 0;

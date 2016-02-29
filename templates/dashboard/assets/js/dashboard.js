@@ -16,6 +16,8 @@ $(window).resize(function(){
 	$('#panel-item-container .panel-item').each(function(index, el) {
 		if ($(el).position().left > 0) {
 			$(el).css('float', 'right');
+		} else {
+			$(el).css('float', '');
 		}
 	});
 });

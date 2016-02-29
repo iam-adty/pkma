@@ -13,7 +13,7 @@
     <div class="container-fluid" style="padding-top: 75px;">
         <div class="row">
             <div class="col-lg-12">
-            	{content}
+            	<h1>Welcome!</h1>
             </div>
         </div>
     </div>
